@@ -1,11 +1,8 @@
-tensorflow
-tensorflow-serving-api
+torch
+torchvision
 scikit-learn
 opencv-python
-h5py
 matplotlib
-Pillow
-requests
 psutil
 imutils
 flask

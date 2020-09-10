@@ -1,7 +1,9 @@
-Dataset/
+data/
 **/__pycache__/
 *.pkl
 *.pth
 *.pb
 *.onnx
 **/variables/
+**/.vscode/
+**/tf-serving/
