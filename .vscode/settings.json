@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "/home/ducviet00/miniconda3/envs/cam-api/bin/python"
+    "python.pythonPath": "/home/ducviet00/miniconda3/envs/face-recog/bin/python",
+    "python.linting.enabled": true
 }
