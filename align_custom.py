@@ -3,6 +3,7 @@ Implement  Dlib Face alignment strategy
 However, this method/approach doesn't deform the original image like Dlib does.
 This also categorizes the face in 3 types: Center, Left, Right
 Align face based on facial landmarks
+https://github.com/vudung45/FaceRec/blob/master/align_custom.py
 '''
 import math
 
