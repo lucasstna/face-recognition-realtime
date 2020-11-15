@@ -5,7 +5,6 @@ import pickle
 
 import cv2
 import numpy as np
-import requests
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -18,14 +17,16 @@ from sklearn.utils import shuffle
 from torch.autograd import Variable
 from torchvision.transforms import ToTensor
 
-from feature_extraction import extract_feature
+from src.feature_extraction import extract_feature
+from src.data_processing import process_data
 from models.torchmodel.model_irse import IR_50
-from utils import *
+from src.utils import *
 import argparse
 
 parser = argparse.ArgumentParser(
     description='facerecog')
-parser.add_argument('--dataset', default="data/processed_data/train", type=str,
+parser.add_argument('--raw', default="")
+parser.add_argument('--dataset', default="data/processed/", type=str,
                     help='Dataset path to train svm')
 parser.add_argument('--classifier_path', default='models/svm/face_classifier_torch_kpop.pkl', type=str,
                     help='path to svm classifier')
@@ -65,9 +66,11 @@ def l2_norm(input, axis=1):
 
 def train_classifier():
     try:
+        if args.raw:
+            process_data(raw_dir=args.raw)
         dataset = get_dataset(args.dataset)
         paths, labels = get_image_paths_and_labels(dataset)
-        paths, labels = shuffle(paths, labels)
+        # paths, labels = shuffle(paths, labels)
         print('Number of labels: %d' % len(set(labels)))
         print('Number of classes: %d' % len(dataset))
         print('Number of images: %d' % len(paths))
@@ -82,6 +85,8 @@ def train_classifier():
             start_index = i*batch_size
             end_index = min((i+1)*batch_size, nrof_images)
             paths_batch = paths[start_index:end_index]
+            print(paths_batch)
+            print(labels[start_index:end_index])
             images = load_data(paths_batch)
             emb_array[start_index:end_index, :] = resnet50(images)
 
@@ -112,18 +117,19 @@ def train_classifier():
 def test_recog():
     with open(args.classifier_path, 'rb') as file:
         svm_model, class_names = pickle.load(file)
-    dataset = get_dataset('data/processed_data/validation')
+    print(class_names)
+    dataset = get_dataset('data/processed/')  #just demo, you should create validate data
     paths, labels = get_image_paths_and_labels(dataset)
     for i in range(len(paths)):
         img = cv2.imread(paths[i])
         img = img[...,::-1]
         emb_array = extract_feature(img, trained_model)
         predictions = svm_model.predict_proba(emb_array)
-        best_class_indices = np.argmax(predictions, axis=1)[0]
-        best_name = class_names[best_class_indices]
-        yhat = class_names[labels[i]]
-        print(best_name, yhat)
+        best_class_indices = np.argmax(predictions, axis=1)
+        predict = class_names[best_class_indices[0]]
+        truth = class_names[labels[i]]
+        print("labels:", truth, "==== predict:", predict)
 
 if __name__ == '__main__':
-    #train_classifier()
+    train_classifier()
     test_recog()

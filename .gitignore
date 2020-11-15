@@ -1,9 +1,9 @@
-data/
 **/__pycache__/
 *.pkl
 *.pth
 *.pb
 *.onnx
+*.tar
 **/variables/
 **/.vscode/
 **/tf-serving/

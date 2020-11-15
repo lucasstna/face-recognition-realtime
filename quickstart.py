@@ -49,7 +49,6 @@ net = RetinaFace(cfg=cfg, phase = 'test')
 net = load_model(net, cfg_detect['trained_model'], cfg_detect['cpu'])
 net.eval()
 print('Finished loading model!')
-print(net)
 cudnn.benchmark = True
 device = torch.device("cpu" if cfg_detect['cpu'] else "cuda")
 net = net.to(device)
