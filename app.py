@@ -2,7 +2,7 @@ from flask import Flask, render_template, Response
 from flask import request, redirect, url_for, make_response
 from src.inference import FaceInference
 app = Flask(__name__)
-facerecog = FaceInference(vid_path='')
+facerecog = FaceInference(vid_path='rtsp://admin:WWXZAK@192.168.10.42:554')
 
 
 @app.route("/", methods=['GET', 'POST'])
@@ -35,6 +35,7 @@ def train_classifier():
     if request.method == 'GET':
         render_template("wait.html")
     facerecog.train_classifier()
+    facerecog.reload_svm()
     return make_response('Trained Classifier', 200)
 
 if __name__ == '__main__':

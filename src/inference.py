@@ -68,7 +68,9 @@ class FaceInference:
 
     def __init__(self, vid_path):
         self.vid_path = vid_path
-
+    def reload_svm(self):
+        with open(self.CLASSIFIER_PATH, 'rb') as file:
+            self.svm_model, self.class_names = pickle.load(file)
     def facerecog_inference(self):
 
         cap = FileVideoStream(self.vid_path).start()
@@ -90,6 +92,8 @@ class FaceInference:
 
                 for b in dets:
                     b *= frame.shape[0] / frame_resized.shape[0]
+                    if b[4] < 0.98:
+                        continue
                     b = list(map(int, b))
                     cropped_face = frame[b[1]:b[3], b[0]:b[2]]
 
@@ -99,7 +103,7 @@ class FaceInference:
                     best_class_probabilities = predictions[
                         np.arange(len(best_class_indices)), best_class_indices]
 
-                    if best_class_probabilities > 0.50:
+                    if best_class_probabilities > 0.60:
                         name = self.class_names[best_class_indices[0]]
                     else:
                         name = "Unknown"
@@ -110,8 +114,8 @@ class FaceInference:
                     cv2.rectangle(frame, (b[0], b[1]), (b[2], b[3]), (0, 0, 255), 2)
                     cx = b[0]
                     cy = b[1] + 12
-                    confidence = "{:.4f}".format(b[4])
-                    cv2.putText(frame, confidence, (cx, cy),
+                    # confidence = "{b[4]}".format(b[4])
+                    cv2.putText(frame, str(best_class_probabilities), (cx, cy),
                                 cv2.FONT_HERSHEY_DUPLEX, 0.5, (255, 255, 255))
                     # landms
                     cv2.circle(frame, (b[5], b[6]), 1, (0, 0, 255), 4)
@@ -163,8 +167,8 @@ class FaceInference:
                 dets = get_bbox_landms(img, self.net, prior_data, self.device)
                 b = dets[0] # get only first face
                 b *= crop_frame.shape[0] / frame_resized.shape[0]
-                b = list(map(int, b))
                 score = b[4] / 2
+                b = list(map(int, b))
             
                 fname = os.path.join(out_path, f'{t0}_{index}.jpg')
                 cropped_face = crop_frame[b[1]:b[3], b[0]:b[2]]
