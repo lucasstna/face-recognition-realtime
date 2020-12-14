@@ -11,7 +11,6 @@ import torch.optim as optim
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 from PIL import Image
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.utils import shuffle
 from torch.autograd import Variable
@@ -64,11 +63,11 @@ def l2_norm(input, axis=1):
     return output
 
 
-def train_classifier():
+def train_classifier(dataset="data/processed/", raw="data/raw/", classifier_path='models/svm/face_classifier_torch_kpop.pkl'):
     try:
-        if args.raw:
-            process_data(raw_dir=args.raw)
-        dataset = get_dataset(args.dataset)
+        if raw:
+            process_data(raw_dir=raw)
+        dataset = get_dataset(dataset)
         paths, labels = get_image_paths_and_labels(dataset)
         # paths, labels = shuffle(paths, labels)
         print('Number of labels: %d' % len(set(labels)))
@@ -90,7 +89,7 @@ def train_classifier():
             images = load_data(paths_batch)
             emb_array[start_index:end_index, :] = resnet50(images)
 
-        classifier_filename_exp = os.path.expanduser(args.classifier_path)
+        classifier_filename_exp = os.path.expanduser(classifier_path)
 
         # Train classifier
         print('Training classifier')
@@ -110,8 +109,9 @@ def train_classifier():
 
     except Exception as e:
         print(str(e))
+        return False
 
-    return 'OK'
+    return True
 
 
 def test_recog():

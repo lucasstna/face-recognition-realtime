@@ -16,6 +16,8 @@ from retinaface.detect import get_bbox_landms, load_model, cal_priorbox
 from retinaface.models.retinaface import RetinaFace
 
 from src.utils import *
+
+
 torch.set_grad_enabled(False)
 cfg = None
 if cfg_detect['network'] == "mobile0.25":

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Face Recog</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+        
+</head>
+
+<body>
+    <div class="mx-auto" style="width: 200px;">
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+    
+                <h5>Face Recog</h5>
+                <form method="POST">
+                    <p class="card-text"><input type=text name=video_path>
+                        <input id="video-path" type=submit name="submit_button" value="Init Video Path"></p>
+                    <!-- action="{{ url_for('add_faceid', id=request.form['faceid']) }}" -->
+    
+                    <p class="card-text"><input type=text name=faceid>
+                        <input id="faceid" type=submit name="submit_button" value="Add FaceID"></p>
+                </form>
+                <form action="{{ url_for('video_feed')}}" method="POST">
+                    <p class="card-text"><input type=submit name="submit_button" value="Start App"></p>
+                </form>
+                <a href="{{ url_for('train_classifier')}}" class="btn btn-primary">Train Classifier</a>
+                
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
