@@ -1,3 +1,6 @@
 [submodule "face.evoLVe.PyTorch"]
 	path = face.evoLVe.PyTorch
 	url = https://github.com/ZhaoJ9014/face.evoLVe.PyTorch.git
+[submodule "Pytorch_Retinaface"]
+	path = retinaface
+	url = https://github.com/biubug6/Pytorch_Retinaface.git
