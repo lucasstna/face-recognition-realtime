@@ -132,15 +132,25 @@ if __name__ == '__main__':
     print("=" * 60)
 
     # optionally resume from a checkpoint
-    if BACKBONE_RESUME_ROOT and HEAD_RESUME_ROOT:
+    # if BACKBONE_RESUME_ROOT and HEAD_RESUME_ROOT:
+    #     print("=" * 60)
+    #     if os.path.isfile(BACKBONE_RESUME_ROOT) and os.path.isfile(HEAD_RESUME_ROOT):
+    #         print("Loading Backbone Checkpoint '{}'".format(BACKBONE_RESUME_ROOT))
+    #         BACKBONE.load_state_dict(torch.load(BACKBONE_RESUME_ROOT))
+    #         print("Loading Head Checkpoint '{}'".format(HEAD_RESUME_ROOT))
+    #         HEAD.load_state_dict(torch.load(HEAD_RESUME_ROOT))
+    #     else:
+    #         print("No Checkpoint Found at '{}' and '{}'. Please Have a Check or Continue to Train from Scratch".format(BACKBONE_RESUME_ROOT, HEAD_RESUME_ROOT))
+    #     print("=" * 60)
+    
+    if BACKBONE_RESUME_ROOT:
         print("=" * 60)
-        if os.path.isfile(BACKBONE_RESUME_ROOT) and os.path.isfile(HEAD_RESUME_ROOT):
+        if os.path.isfile(BACKBONE_RESUME_ROOT):
             print("Loading Backbone Checkpoint '{}'".format(BACKBONE_RESUME_ROOT))
             BACKBONE.load_state_dict(torch.load(BACKBONE_RESUME_ROOT))
-            print("Loading Head Checkpoint '{}'".format(HEAD_RESUME_ROOT))
-            HEAD.load_state_dict(torch.load(HEAD_RESUME_ROOT))
         else:
-            print("No Checkpoint Found at '{}' and '{}'. Please Have a Check or Continue to Train from Scratch".format(BACKBONE_RESUME_ROOT, HEAD_RESUME_ROOT))
+            print("No Checkpoint Found at '{}'. Please Have a Check or Continue to Train from Scratch".format(
+                BACKBONE_RESUME_ROOT))
         print("=" * 60)
 
     if MULTI_GPU:
@@ -153,7 +163,7 @@ if __name__ == '__main__':
 
 
     #======= train & validation & save checkpoint =======#
-    DISP_FREQ = len(train_loader) // 100 # frequency to display training loss & acc
+    DISP_FREQ = 1 # frequency to display training loss & acc
 
     NUM_EPOCH_WARM_UP = NUM_EPOCH // 25  # use the first 1/25 epochs to warm up
     NUM_BATCH_WARM_UP = len(train_loader) * NUM_EPOCH_WARM_UP  # use the first 1/25 epochs to warm up
@@ -188,7 +198,7 @@ if __name__ == '__main__':
             loss = LOSS(outputs, labels)
 
             # measure accuracy and record loss
-            prec1, prec5 = accuracy(outputs.data, labels, topk = (1, 5))
+            prec1, prec5 = accuracy(outputs.data, labels, topk = (1, 2))
             losses.update(loss.data.item(), inputs.size(0))
             top1.update(prec1.data.item(), inputs.size(0))
             top5.update(prec5.data.item(), inputs.size(0))
@@ -213,8 +223,8 @@ if __name__ == '__main__':
         # training statistics per epoch (buffer for visualization)
         epoch_loss = losses.avg
         epoch_acc = top1.avg
-        writer.add_scalar("Training_Loss", epoch_loss, epoch + 1)
-        writer.add_scalar("Training_Accuracy", epoch_acc, epoch + 1)
+        # writer.add_scalar("Training_Loss", epoch_loss, epoch + 1)
+        # writer.add_scalar("Training_Accuracy", epoch_acc, epoch + 1)
         print("=" * 60)
         print('Epoch: {}/{}\t'
               'Training Loss {loss.val:.4f} ({loss.avg:.4f})\t'
