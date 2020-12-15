@@ -18,7 +18,7 @@ from torchvision.transforms import ToTensor
 
 from src.feature_extraction import extract_feature
 from src.data_processing import process_data
-from models.torchmodel.model_irse import IR_50
+from models.arcface.model_irse import IR_50
 from src.utils import *
 import argparse
 
@@ -38,7 +38,7 @@ INPUT_IMAGE_SIZE = 112
 
 trained_model = IR_50((INPUT_IMAGE_SIZE, INPUT_IMAGE_SIZE))
 trained_model.load_state_dict(torch.load(
-    'models/torchmodel/backbone_ir50_asia.pth'))
+    'models/arcface/backbone_ir50_asia.pth'))
 trained_model.eval()
 
 if torch.cuda.is_available():

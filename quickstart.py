@@ -19,7 +19,7 @@ import torchvision.transforms as transforms
 from imutils.video import FPS, FileVideoStream
 
 from src.feature_extraction import extract_feature
-from models.torchmodel.model_irse import IR_50
+from models.arcface.model_irse import IR_50
 from retinaface.config import cfg_detect
 from retinaface.data import cfg_mnet, cfg_re50
 from retinaface.detect import get_bbox_landms, load_model, cal_priorbox
@@ -34,7 +34,7 @@ parser.add_argument('--test_device', default="cuda:0", type=str,
                     help='cuda:0 or cpu')
 parser.add_argument('--classifier_path', default='models/svm/face_classifier_torch.pkl', type=str,
                     help='path to svm classifier')
-parser.add_argument('--emb_model', default='models/torchmodel/backbone_ir50_asia.pth', type=str,
+parser.add_argument('--emb_model', default='models/arcface/backbone_ir50_asia.pth', type=str,
                     help='dir pth model')
 args = parser.parse_args()
 

@@ -20,7 +20,7 @@ import torch.optim as optim
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 from imutils.video import FPS, FileVideoStream
-from models.torchmodel.model_irse import IR_50
+from models.arcface.model_irse import IR_50
 from retinaface.config import cfg_detect
 from retinaface.data import cfg_mnet, cfg_re50
 from retinaface.detect import cal_priorbox, get_bbox_landms, load_model
@@ -34,7 +34,7 @@ from src.utils import *
 class FaceInference:
 
     CLASSIFIER_PATH = 'models/svm/face_classifier_torch.pkl'
-    EMB_MODEL = 'models/torchmodel/backbone_ir50_asia.pth'
+    EMB_MODEL = 'models/arcface/backbone_ir50_asia.pth'
     DATASET = 'data/processed'
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -147,17 +147,18 @@ class FaceInference:
             if frame is None:
                 continue
             h, w, d = frame.shape
+            frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
-            margin_h = 0.1  # horizontal
-            margin_top = 0.15
-            crop_left = (int(w*margin_h), int(h*margin_top))
-            crop_right = (int(w*(1-margin_h)), int(h*margin_top + w*(1-2*margin_h)))
+            # margin_h = 0.1  # horizontal
+            # margin_top = 0.15
+            # crop_left = (int(w*margin_h), int(h*margin_top))
+            # crop_right = (int(w*(1-margin_h)), int(h*margin_top + w*(1-2*margin_h)))
 
-            cv2.rectangle(frame, crop_left, crop_right, (0, 255, 0), 5)
+            # cv2.rectangle(frame, crop_left, crop_right, (0, 255, 0), 5)
 
-            crop_frame = frame[crop_left[1]:crop_right[1],
-                               crop_left[0]:crop_right[0]]
-            frame_resized = imutils.resize(crop_frame, width=360)
+            # crop_frame = frame[crop_left[1]:crop_right[1],
+            #                    crop_left[0]:crop_right[0]]
+            frame_resized = imutils.resize(frame, width=360)
             img = np.float32(frame_resized)
 
             if prior_data is None:
@@ -166,18 +167,18 @@ class FaceInference:
             try:
                 dets = get_bbox_landms(img, self.net, prior_data, self.device)
                 b = dets[0] # get only first face
-                b *= crop_frame.shape[0] / frame_resized.shape[0]
+                b *= frame.shape[0] / frame_resized.shape[0]
                 score = b[4] / 2
                 b = list(map(int, b))
             
                 fname = os.path.join(out_path, f'{t0}_{index}.jpg')
-                cropped_face = crop_frame[b[1]:b[3], b[0]:b[2]]
+                cropped_face = frame[b[1]:b[3], b[0]:b[2]]
                 if cv2.imwrite(fname, cropped_face):
                     index += 1
 
-                cv2.putText(crop_frame, "{:.2f}".format(score), (b[0] + 30, b[1] + 30),
+                cv2.putText(frame, "{:.2f}".format(score), (b[0] + 30, b[1] + 30),
                             cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 255))
-                cv2.rectangle(crop_frame, (b[0], b[1]),
+                cv2.rectangle(frame, (b[0], b[1]),
                               (b[2], b[3]), (0, 0, 255), 2)
             except:
                 pass

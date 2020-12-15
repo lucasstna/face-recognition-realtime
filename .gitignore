@@ -7,3 +7,5 @@
 **/variables/
 **/.vscode/
 **/tf-serving/
+data/
+*.zip
