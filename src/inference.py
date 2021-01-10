@@ -66,7 +66,7 @@ class FaceInference:
         svm_model, class_names = pickle.load(file)
 
 
-    def __init__(self, vid_path):
+    def __init__(self, vid_path="./test.mp4"):
         self.vid_path = vid_path
     def reload_svm(self):
         with open(self.CLASSIFIER_PATH, 'rb') as file:
@@ -103,7 +103,7 @@ class FaceInference:
                     best_class_probabilities = predictions[
                         np.arange(len(best_class_indices)), best_class_indices]
 
-                    if best_class_probabilities > 0.60:
+                    if best_class_probabilities > 0.55:
                         name = self.class_names[best_class_indices[0]]
                     else:
                         name = "Unknown"
@@ -147,7 +147,7 @@ class FaceInference:
             if frame is None:
                 continue
             h, w, d = frame.shape
-            frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
+            # frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
             # margin_h = 0.1  # horizontal
             # margin_top = 0.15
@@ -204,7 +204,7 @@ class FaceInference:
             print('Number of images: %d' % len(paths))
             print('Calculating features for images')
             embedding_size = 512
-            batch_size = 32
+            batch_size = 8
             nrof_images = len(paths)
             nrof_batches_per_epoch = int(math.ceil(1.0*nrof_images / batch_size))
             emb_array = np.zeros((nrof_images, embedding_size))
