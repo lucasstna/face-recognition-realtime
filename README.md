@@ -1,7 +1,5 @@
 # READ ME
 
-Face Recoginition is my project of the deep learning class, which is organized by AI For Everyone (AI4E). 
-
 ![img](https://i.imgur.com/fuLRu4B.png)
 
 In this project, I have referred many face detect, face recognition model as [David Sandberg's facenet](https://github.com/davidsandberg/facenet), [InsightFace](https://github.com/deepinsight/insightface), [Ultra-lightweight face detection model (ULFD)](https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB) and many other repos on github. Lastly, I end up with [Retina Face](https://github.com/biubug6/Pytorch_Retinaface)  face detector and [face.evoLVe](https://github.com/ZhaoJ9014/face.evoLVe.PyTorch) face recognizer. 
