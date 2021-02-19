@@ -25,7 +25,7 @@ Performance was evaluated on my laptop with AMD Ryzen 7 4800HS and NVIDIA GTX 16
 |Model|FPS|
 | ------------- | ------------- |
 |MTCNN + FaceNet + SVM|8 |
-|ULFD + face.evoLVe + SVM| 45|
+|Retina Face (mobilenet0.25) + face.evoLVe + SVM| 45|
 
 
 ## Usage
