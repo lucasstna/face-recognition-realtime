@@ -25,16 +25,18 @@ from retinaface.data import cfg_mnet, cfg_re50
 from retinaface.detect import get_bbox_landms, load_model, cal_priorbox
 from retinaface.models.retinaface import RetinaFace
 
+from src.train_classifier_embeddings import train_classifier
+
 
 parser = argparse.ArgumentParser(
     description='facerecog')
-parser.add_argument('--path', default="test.mp4", type=str,
+parser.add_argument('--path', default="video.mp4", type=str,
                     help='video dir')
-parser.add_argument('--test_device', default="cuda:0", type=str,
+parser.add_argument('--test_device', default="cpu", type=str,
                     help='cuda:0 or cpu')
 parser.add_argument('--classifier_path', default='models/svm/face_classifier_torch.pkl', type=str,
                     help='path to svm classifier')
-parser.add_argument('--emb_model', default='models/arcface/backbone_ir50_asia.pth', type=str,
+parser.add_argument('--emb_model', default='models/arcface/backbone_ir50_epoch120.pth', type=str,
                     help='dir pth model')
 args = parser.parse_args()
 
@@ -56,17 +58,26 @@ net = net.to(device)
 # Face Embedding
 face_emb = IR_50((112, 112))
 face_emb.eval()
-face_emb.load_state_dict(torch.load(args.emb_model))
+face_emb.load_state_dict(torch.load(args.emb_model, map_location=torch.device('cpu')))
 if torch.cuda.is_available():
     face_emb.cuda()
     torch.cuda.empty_cache()
+
+
 # SVM load
-with open(args.classifier_path, 'rb') as file:
-    svm_model, class_names = pickle.load(file)
+# with open(args.classifier_path, 'rb') as file:
+#     svm_model, class_names = pickle.load(file)
+emb_arrays, class_names = train_classifier()
+
+
 time.sleep(2.0)
 print("loaded")
 
 cap = FileVideoStream(args.path).start()
+
+video_writer = cv2.VideoWriter(str('{}.avi'.format('output')),
+                                   cv2.VideoWriter_fourcc(*'XVID'), int(cap.stream.get(cv2.CAP_PROP_FPS)), (1280,720))
+
 fps = FPS().start()
 prior_data = None
 while cap.more():
@@ -90,13 +101,17 @@ while cap.more():
             cropped_face = frame[b[1]:b[3], b[0]:b[2]]
 
             emb_array = extract_feature(cropped_face, face_emb)
-            predictions = svm_model.predict_proba(emb_array)
-            best_class_indices = np.argmax(predictions, axis=1)
-            best_class_probabilities = predictions[
-                np.arange(len(best_class_indices)), best_class_indices]
+            dist = torch.sum(torch.pow(emb_array - emb_arrays, 2), dim = 1)
+            minimum_dist, minimum_dist_idx = torch.min(dist.view(1, -1), 1)
 
-            if best_class_probabilities > 0.50:
-                name = class_names[best_class_indices[0]]
+
+            # predictions = svm_model.predict_proba(emb_array)
+            # best_class_indices = np.argmax(predictions, axis=1)
+            # best_class_probabilities = predictions[
+            #     np.arange(len(best_class_indices)), best_class_indices]
+
+            if minimum_dist > 0.50:
+                name = class_names[minimum_dist_idx.item()]
             else:
                 name = "Unknown"
 
@@ -123,13 +138,11 @@ while cap.more():
             str(1/(time.time() - t0))[:5] + " FPS"
     cv2.putText(frame, fpstext,
             (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (160, 180, 255), 2)
-    cv2.imshow('Face Recognition', frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+    video_writer.write(frame)
     fps.update()
 
-cv2.destroyAllWindows()
 cap.stop()
 fps.stop()
+video_writer.release()
 print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
 print("[INFO] FPS: {:.2f}".format(fps.fps()))
